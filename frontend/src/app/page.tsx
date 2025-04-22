@@ -23,25 +23,18 @@ export default function Home() {
     const password = formData.get('password');
 
     try {
-      // Get CSRF cookie first
-      await fetch(`${API_URL}/sanctum/csrf-cookie`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      // Then attempt login
+      // Attempt login
       const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
+          'x-requested-with': 'XMLHttpRequest'
         },
         credentials: 'include',
         body: JSON.stringify({ 
           email, 
-          password,
-          device_name: 'web_browser'
+          password
         }),
       });
 

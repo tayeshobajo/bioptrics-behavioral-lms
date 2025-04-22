@@ -17,10 +17,12 @@ export default function CourseCard({ title, description, thumbnailUrl, progress,
     <div className="overflow-hidden rounded-xl bg-white shadow-lg transition-transform hover:scale-[1.02]">
       <div className="relative h-48 w-full">
         <Image
-          src={thumbnailUrl}
+          src={thumbnailUrl || 'https://placehold.co/600x400?text=Course+Thumbnail'}
           alt={title}
           fill
           className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={false}
         />
       </div>
       <div className="p-6">

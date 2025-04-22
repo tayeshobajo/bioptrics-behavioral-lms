@@ -22,26 +22,16 @@ export default function LoginForm() {
     const password = formData.get('password');
 
     try {
-      // Get CSRF cookie first
-      await fetch(`${API_URL}/sanctum/csrf-cookie`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      // Then attempt login
+      // Attempt login with JWT
       const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
+          'x-requested-with': 'XMLHttpRequest'
         },
         credentials: 'include',
-        body: JSON.stringify({ 
-          email, 
-          password,
-          device_name: 'web_browser'
-        }),
+        body: JSON.stringify({ email, password })
       });
 
       const data = await res.json();
@@ -52,10 +42,13 @@ export default function LoginForm() {
 
       // Store token and user data
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('user', JSON.stringify({
+        ...data.user,
+        role: { slug: data.user.role }  // Adapt role format from Node.js API
+      }));
 
-      // Use router.push instead of window.location for client-side navigation
-      if (data.user.role.slug === 'admin') {
+      // Use router.push for client-side navigation
+      if (data.user.role === 'admin') {
         router.push('/admin');
       } else {
         router.push('/dashboard');
@@ -105,9 +98,9 @@ export default function LoginForm() {
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
                 required
-                className="block w-full rounded-lg border-0 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-900 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                placeholder="Enter your email"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#97C646] focus:border-[#97C646]"
               />
             </div>
             <div>
@@ -118,9 +111,9 @@ export default function LoginForm() {
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="current-password"
                 required
-                className="block w-full rounded-lg border-0 px-4 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-900 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                placeholder="Enter your password"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#97C646] focus:border-[#97C646]"
               />
             </div>
           </div>
@@ -128,7 +121,7 @@ export default function LoginForm() {
           <div>
             <Button
               type="submit"
-              className="w-full bg-[#552A47] hover:bg-[#552A47]/90"
+              className="w-full flex justify-center py-2 px-4"
               loading={loading}
             >
               Sign in

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { API_URL } from '@/lib/config';
 
 import {
   HomeIcon,
@@ -49,11 +50,15 @@ const menuGroups: MenuGroups = {
         e.preventDefault();
         try {
           const token = localStorage.getItem('token');
-          const response = await fetch('/api/logout', {
+          const response = await fetch(`${API_URL}/api/logout`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'x-requested-with': 'XMLHttpRequest',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            credentials: 'include'
           });
 
           if (!response.ok) {

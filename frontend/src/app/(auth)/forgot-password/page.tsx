@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { API_URL } from '@/lib/config';
 import Button from '@/components/ui/Button';
 
 export default function ForgotPasswordPage() {
@@ -16,11 +17,14 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:8000/api/forgot-password', {
+      const res = await fetch(`${API_URL}/api/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'x-requested-with': 'XMLHttpRequest'
         },
+        credentials: 'include',
         body: JSON.stringify({ email }),
       });
 
