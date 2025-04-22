@@ -14,26 +14,11 @@ class Role extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description',
-        'permissions'
+        'description'
     ];
-
-    protected $casts = [
-        'permissions' => 'array'
-    ];
-
-    // Role constants
-    public const ADMIN = 'admin';
-    public const GROUP_LEADER = 'group-leader';
-    public const CUSTOMER = 'customer';
 
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
-    }
-
-    public function hasPermission(string $permission): bool
-    {
-        return in_array($permission, $this->permissions ?? []);
     }
 }

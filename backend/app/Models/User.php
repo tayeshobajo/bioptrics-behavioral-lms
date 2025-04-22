@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable
 {
@@ -69,6 +71,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the course enrollments for the user.
+     */
+    public function courseEnrollments(): HasMany
+    {
+        return $this->hasMany(CourseEnrollment::class);
+    }
+
+    /**
      * Check if the user has a specific role.
      *
      * @param string $role
@@ -107,5 +117,24 @@ class User extends Authenticatable
     public function isCustomer(): bool
     {
         return $this->hasRole(Role::CUSTOMER);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            // Automatically enroll user in default courses
+            $defaultCourses = Course::where('is_default', true)->get();
+            foreach ($defaultCourses as $course) {
+                CourseEnrollment::create([
+                    'user_id' => $user->id,
+                    'course_id' => $course->id,
+                ]);
+            }
+        });
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

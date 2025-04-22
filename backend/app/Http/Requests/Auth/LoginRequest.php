@@ -29,9 +29,14 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get the credentials for authentication.
+     */
     public function getCredentials(): array
     {
-        $credentials = $this->only('email', 'password');
-        return $credentials;
+        return [
+            'email' => $this->email,
+            'password' => $this->password,
+        ];
     }
 }

@@ -3,7 +3,10 @@
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\ProfileController;
+use App\Http\Controllers\Api\Auth\PasswordResetController;
+use App\Http\Controllers\Api\CourseController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public routes
-Route::post('/login', [LoginController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+Route::post('/register', [RegisterController::class, 'register'])->name('register');
+Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword'])->name('password.forgot');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.reset');
 
 // Registration (only admin and group leader can register new users)
 Route::middleware(['auth:sanctum', 'role:admin,group-leader'])->post('/register', RegisterController::class);
@@ -20,13 +26,18 @@ Route::middleware(['auth:sanctum', 'role:admin,group-leader'])->post('/register'
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
-    Route::post('/logout', [LoginController::class, 'logout']);
-    Route::post('/refresh', [LoginController::class, 'refresh']);
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::post('/refresh', [LoginController::class, 'refresh'])->name('refresh');
+    
+    // User route for getting authenticated user
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
     
     // Profile routes
     Route::prefix('profile')->group(function () {
-        Route::get('/', [ProfileController::class, 'show']);
-        Route::patch('/', [ProfileController::class, 'update']);
+        Route::get('/', [ProfileController::class, 'show'])->name('profile.show');
+        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::patch('/password', [ProfileController::class, 'updatePassword']);
     });
 
@@ -55,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Customer routes
     Route::middleware('role:customer')->group(function () {
         Route::prefix('learning')->group(function () {
+            Route::get('/courses/enrolled', [CourseController::class, 'enrolled']);
             // Future customer endpoints will go here
             // Examples:
             // - Course access

@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Admin Dashboard - TeamSynerG Programs',
+  description: 'TeamSynerG Programs - Empowering Growth Through Learning',
+};
+
 export default function AdminLayout({
   children,
 }: {
